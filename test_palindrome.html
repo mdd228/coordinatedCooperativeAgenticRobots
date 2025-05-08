@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Palindrome Detector Tests</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
+        .test-case { margin: 10px 0; padding: 10px; border: 1px solid #ddd; }
+        .pass { color: green; }
+        .fail { color: red; }
+    </style>
+</head>
+<body>
+    <h1>Palindrome Detector Tests</h1>
+    <div id="testResults"></div>
+
+    <script>
+        function isPalindrome(word) {
+            word = word.toLowerCase().replace(/\s/g, '');
+            return word === word.split('').reverse().join('');
+        }
+
+        const testCases = [
+            {
+                input: "madam",
+                expected: true,
+                description: "Simple palindrome"
+            },
+            {
+                input: "Madam Arora teaches malayalam",
+                expected: ["madam", "arora", "malayalam"],
+                description: "Multiple palindromes in sentence"
+            },
+            {
+                input: "hello world",
+                expected: [],
+                description: "No palindromes"
+            },
+            {
+                input: "A man, a plan, a canal: Panama",
+                expected: ["a", "a", "a"],
+                description: "Palindromes with punctuation"
+            }
+        ];
+
+        function runTests() {
+            const resultsDiv = document.getElementById('testResults');
+            let allPassed = true;
+
+            testCases.forEach((test, index) => {
+                const testDiv = document.createElement('div');
+                testDiv.className = 'test-case';
+                
+                let passed = false;
+                let result = '';
+
+                if (Array.isArray(test.expected)) {
+                    // Test for multiple palindromes
+                    const words = test.input.toLowerCase().split(/\s+/);
+                    const cleanWords = words.map(word => word.replace(/[.,!?]/g, ''));
+                    const foundPalindromes = cleanWords.filter(word => isPalindrome(word));
+                    passed = JSON.stringify(foundPalindromes.sort()) === JSON.stringify(test.expected.sort());
+                    result = `Found: ${foundPalindromes.join(', ')}`;
+                } else {
+                    // Test for single palindrome
+                    passed = isPalindrome(test.input) === test.expected;
+                    result = `Result: ${isPalindrome(test.input)}`;
+                }
+
+                testDiv.innerHTML = `
+                    <h3>Test ${index + 1}: ${test.description}</h3>
+                    <p>Input: "${test.input}"</p>
+                    <p>Expected: ${JSON.stringify(test.expected)}</p>
+                    <p>${result}</p>
+                    <p class="${passed ? 'pass' : 'fail'}">${passed ? 'PASS' : 'FAIL'}</p>
+                `;
+
+                resultsDiv.appendChild(testDiv);
+                if (!passed) allPassed = false;
+            });
+
+            const summary = document.createElement('div');
+            summary.innerHTML = `<h2>${allPassed ? 'All tests passed!' : 'Some tests failed!'}</h2>`;
+            resultsDiv.insertBefore(summary, resultsDiv.firstChild);
+        }
+
+        // Run tests when page loads
+        window.onload = runTests;
+    </script>
+</body>
+</html> 
