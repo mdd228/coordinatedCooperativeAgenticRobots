@@ -167,7 +167,7 @@
 </head>
 <body>
     <div class="container">
-        <h1 id="main-title">Coordinated, Cooperative, Intelligent Agentic Robots</h1>
+        <h1 id="main-title">Creative, Coordinated, Cooperative, Intelligent Agentic Robots</h1>
         <div id="palindrome-results" style="text-align:center; font-size:1.2em; margin-bottom: 16px;"></div>
         
         <div class="input-area">
@@ -178,7 +178,7 @@
         <div style="display: flex; gap: 24px; align-items: flex-start; margin-bottom: 18px;">
             <div style="flex: 2;">
                 <div class="agent-pool">
-                    <h2>Available Agents</h2>
+                    <h2>Agent Pool</h2>
                     <div id="agent-pool"></div>
                 </div>
             </div>
@@ -206,7 +206,7 @@
 
     <script>
         // Agent definitions
-        const availableAgents = {
+        const agentPool = {
             'LoadInput': {
                 description: 'Loads input text',
                 execute: (text) => text
@@ -256,11 +256,11 @@
         function initializeAgentPool() {
             const pool = document.getElementById('agent-pool');
             pool.innerHTML = '';
-            Object.keys(availableAgents).forEach(agentName => {
+            Object.keys(agentPool).forEach(agentName => {
                 const agent = document.createElement('div');
                 agent.className = 'agent available';
                 agent.textContent = agentName;
-                agent.title = availableAgents[agentName].description;
+                agent.title = agentPool[agentName].description;
                 agent.onclick = () => recruitAgent(agentName);
                 pool.appendChild(agent);
             });
@@ -268,7 +268,7 @@
 
         // Recruit an agent
         function recruitAgent(agentName) {
-            const agent = document.querySelector(`.agent[title="${availableAgents[agentName].description}"]`);
+            const agent = document.querySelector(`.agent[title="${agentPool[agentName].description}"]`);
             if (agent && agent.classList.contains('available')) {
                 // Determine which robot needs this agent
                 const robotA = robots['A'];
@@ -285,7 +285,7 @@
         // Assign agent to a robot
         function assignAgentToRobot(agentName, robotId) {
             const robot = robots[robotId];
-            const agent = document.querySelector(`.agent[title="${availableAgents[agentName].description}"]`);
+            const agent = document.querySelector(`.agent[title="${agentPool[agentName].description}"]`);
             
             if (agent && robot) {
                 agent.classList.remove('available');
@@ -304,13 +304,13 @@
 
         // Create a new agent if needed
         function createAgent(agentName, description, executeFunction) {
-            if (!availableAgents[agentName]) {
+            if (!agentPool[agentName]) {
                 // Show agent in factory with fine print
                 const factoryDiv = document.getElementById('agent-factory');
                 factoryDiv.innerHTML = `<div><span class='factory-agent visible'>${agentName}</span><div class='factory-fineprint'>Made by Agent Factory</div></div>`;
                 setTimeout(() => { factoryDiv.innerHTML = ''; }, 1200);
                 // Add to availableAgents for logic
-                availableAgents[agentName] = {
+                agentPool[agentName] = {
                     description: description,
                     execute: executeFunction
                 };
@@ -328,7 +328,7 @@
             // Dynamically add RemoveNumbers if input contains digits
             if (/\d/.test(inputText) && !robots['A'].requiredAgents.includes('RemoveNumbers')) {
                 // Create RemoveNumbers agent if not present
-                if (!availableAgents['RemoveNumbers']) {
+                if (!agentPool['RemoveNumbers']) {
                     createAgent('RemoveNumbers', 'Removes numbers', (text) => text.replace(/[0-9]/g, ''));
                 }
                 robots['A'].requiredAgents.push('RemoveNumbers');
@@ -340,7 +340,7 @@
             // Dynamically add RemoveCharacters if input contains special characters
             if (/[\$%&#@]/.test(inputText) && !robots['A'].requiredAgents.includes('RemoveCharacters')) {
                 // Create RemoveCharacters agent if not present
-                if (!availableAgents['RemoveCharacters']) {
+                if (!agentPool['RemoveCharacters']) {
                     createAgent('RemoveCharacters', 'Removes special characters ($, %, &, #, @, etc.)', (text) => text.replace(/[$%&#@]/g, ''));
                 }
                 robots['A'].requiredAgents.push('RemoveCharacters');
@@ -356,7 +356,7 @@
                 for (const requiredAgent of robot.requiredAgents) {
                     if (!robot.currentAgents.includes(requiredAgent)) {
                         log(`Robot ${robotId} needs agent: ${requiredAgent}`);
-                        if (!availableAgents[requiredAgent]) {
+                        if (!agentPool[requiredAgent]) {
                             createAgent(requiredAgent, 'Custom agent', (text) => text);
                         }
                         recruitAgent(requiredAgent);
@@ -367,7 +367,7 @@
             // Process text through Robot A
             let processedText = inputText;
             for (const agentName of robots['A'].currentAgents) {
-                const agent = availableAgents[agentName];
+                const agent = agentPool[agentName];
                 log(`Robot A using ${agentName}...`);
                 if (Array.isArray(processedText)) {
                     // Always apply string-processing agents to each word
@@ -392,7 +392,7 @@
                     let reversed = word;
                     let isPalindrome = false;
                     for (const agentName of robots['B'].currentAgents) {
-                        const agent = availableAgents[agentName];
+                        const agent = agentPool[agentName];
                         log(`Robot B using ${agentName}...`);
                         if (agentName === 'ReverseText') {
                             reversed = agent.execute(word);
