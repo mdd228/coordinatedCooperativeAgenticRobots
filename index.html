@@ -192,12 +192,12 @@
 
         <div class="workspace">
             <div class="robot">
-                <h2>Robot A (Processor)</h2>
-                <div id="robot-a-agents"></div>
+                <h2>Robota</h2>
+                <div id="robota-agents"></div>
             </div>
             <div class="robot">
-                <h2>Robot B (Checker)</h2>
-                <div id="robot-b-agents"></div>
+                <h2>Roboto</h2>
+                <div id="roboto-agents"></div>
             </div>
         </div>
 
@@ -235,14 +235,14 @@
 
         // Robot definitions
         const robots = {
-            'A': {
-                name: 'Processor',
+            'Robota': {
+                name: 'Robota',
                 requiredAgents: ['LoadInput', 'ToLower', 'RemovePunct', 'SplitWords'],
                 currentAgents: [],
                 tasks: []
             },
-            'B': {
-                name: 'Checker',
+            'Roboto': {
+                name: 'Roboto',
                 requiredAgents: ['ReverseText', 'CompareText'],
                 currentAgents: [],
                 tasks: []
@@ -268,17 +268,13 @@
 
         // Recruit an agent
         function recruitAgent(agentName) {
-            const agent = document.querySelector(`.agent[title="${agentPool[agentName].description}"]`);
-            if (agent && agent.classList.contains('available')) {
-                // Determine which robot needs this agent
-                const robotA = robots['A'];
-                const robotB = robots['B'];
-                
-                if (robotA.requiredAgents.includes(agentName) && !robotA.currentAgents.includes(agentName)) {
-                    assignAgentToRobot(agentName, 'A');
-                } else if (robotB.requiredAgents.includes(agentName) && !robotB.currentAgents.includes(agentName)) {
-                    assignAgentToRobot(agentName, 'B');
-                }
+            const robota = robots['Robota'];
+            const roboto = robots['Roboto'];
+            
+            if (robota.requiredAgents.includes(agentName) && !robota.currentAgents.includes(agentName)) {
+                assignAgentToRobot(agentName, 'Robota');
+            } else if (roboto.requiredAgents.includes(agentName) && !roboto.currentAgents.includes(agentName)) {
+                assignAgentToRobot(agentName, 'Roboto');
             }
         }
 
@@ -292,13 +288,13 @@
                 agent.classList.add('assigned');
                 robot.currentAgents.push(agentName);
                 
-                const robotDiv = document.getElementById(`robot-${robotId.toLowerCase()}-agents`);
+                const robotDiv = document.getElementById(`${robotId.toLowerCase()}-agents`);
                 const agentDiv = document.createElement('div');
                 agentDiv.className = 'agent assigned';
                 agentDiv.textContent = agentName;
                 robotDiv.appendChild(agentDiv);
                 
-                log(`Robot ${robotId} recruited agent: ${agentName}`);
+                log(`${robotId} recruited agent: ${agentName}`);
             }
         }
 
@@ -326,28 +322,28 @@
             createdAgentsThisCycle = new Set();
 
             // Dynamically add RemoveNumbers if input contains digits
-            if (/\d/.test(inputText) && !robots['A'].requiredAgents.includes('RemoveNumbers')) {
+            if (/\d/.test(inputText) && !robots['Robota'].requiredAgents.includes('RemoveNumbers')) {
                 // Create RemoveNumbers agent if not present
                 if (!agentPool['RemoveNumbers']) {
                     createAgent('RemoveNumbers', 'Removes numbers', (text) => text.replace(/[0-9]/g, ''));
                 }
-                robots['A'].requiredAgents.push('RemoveNumbers');
-                log('Robot A will require RemoveNumbers agent due to digits in input.');
-            } else if (!/\d/.test(inputText) && robots['A'].requiredAgents.includes('RemoveNumbers')) {
-                robots['A'].requiredAgents = robots['A'].requiredAgents.filter(a => a !== 'RemoveNumbers');
-                robots['A'].currentAgents = robots['A'].currentAgents.filter(a => a !== 'RemoveNumbers');
+                robots['Robota'].requiredAgents.push('RemoveNumbers');
+                log('Robota will require RemoveNumbers agent due to digits in input.');
+            } else if (!/\d/.test(inputText) && robots['Robota'].requiredAgents.includes('RemoveNumbers')) {
+                robots['Robota'].requiredAgents = robots['Robota'].requiredAgents.filter(a => a !== 'RemoveNumbers');
+                robots['Robota'].currentAgents = robots['Robota'].currentAgents.filter(a => a !== 'RemoveNumbers');
             }
             // Dynamically add RemoveCharacters if input contains special characters
-            if (/[\$%&#@]/.test(inputText) && !robots['A'].requiredAgents.includes('RemoveCharacters')) {
+            if (/[$%&#@]/.test(inputText) && !robots['Robota'].requiredAgents.includes('RemoveCharacters')) {
                 // Create RemoveCharacters agent if not present
                 if (!agentPool['RemoveCharacters']) {
                     createAgent('RemoveCharacters', 'Removes special characters ($, %, &, #, @, etc.)', (text) => text.replace(/[$%&#@]/g, ''));
                 }
-                robots['A'].requiredAgents.push('RemoveCharacters');
-                log('Robot A will require RemoveCharacters agent due to special characters in input.');
-            } else if (!/[\$%&#@]/.test(inputText) && robots['A'].requiredAgents.includes('RemoveCharacters')) {
-                robots['A'].requiredAgents = robots['A'].requiredAgents.filter(a => a !== 'RemoveCharacters');
-                robots['A'].currentAgents = robots['A'].currentAgents.filter(a => a !== 'RemoveCharacters');
+                robots['Robota'].requiredAgents.push('RemoveCharacters');
+                log('Robota will require RemoveCharacters agent due to special characters in input.');
+            } else if (!/[$%&#@]/.test(inputText) && robots['Robota'].requiredAgents.includes('RemoveCharacters')) {
+                robots['Robota'].requiredAgents = robots['Robota'].requiredAgents.filter(a => a !== 'RemoveCharacters');
+                robots['Robota'].currentAgents = robots['Robota'].currentAgents.filter(a => a !== 'RemoveCharacters');
             }
 
             // Ensure all required agents are available
@@ -355,7 +351,7 @@
                 const robot = robots[robotId];
                 for (const requiredAgent of robot.requiredAgents) {
                     if (!robot.currentAgents.includes(requiredAgent)) {
-                        log(`Robot ${robotId} needs agent: ${requiredAgent}`);
+                        log(`${robotId} needs agent: ${requiredAgent}`);
                         if (!agentPool[requiredAgent]) {
                             createAgent(requiredAgent, 'Custom agent', (text) => text);
                         }
@@ -364,11 +360,11 @@
                 }
             }
 
-            // Process text through Robot A
+            // Process text through Robota
             let processedText = inputText;
-            for (const agentName of robots['A'].currentAgents) {
+            for (const agentName of robots['Robota'].currentAgents) {
                 const agent = agentPool[agentName];
-                log(`Robot A using ${agentName}...`);
+                log(`Robota using ${agentName}...`);
                 if (Array.isArray(processedText)) {
                     // Always apply string-processing agents to each word
                     if (["ToLower","RemovePunct","RemoveNumbers","RemoveCharacters"].includes(agentName)) {
@@ -385,15 +381,15 @@
             // At this point, processedText should be an array of cleaned words
             let cleanedWords = Array.isArray(processedText) ? processedText : (typeof processedText === 'string' ? processedText.split(/\s+/) : []);
 
-            // Process through Robot B
+            // Process through Roboto
             if (Array.isArray(cleanedWords)) {
                 const results = [];
                 for (const word of cleanedWords) {
                     let reversed = word;
                     let isPalindrome = false;
-                    for (const agentName of robots['B'].currentAgents) {
+                    for (const agentName of robots['Roboto'].currentAgents) {
                         const agent = agentPool[agentName];
-                        log(`Robot B using ${agentName}...`);
+                        log(`Roboto using ${agentName}...`);
                         if (agentName === 'ReverseText') {
                             reversed = agent.execute(word);
                         } else if (agentName === 'CompareText') {
