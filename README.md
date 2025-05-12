@@ -27,3 +27,4 @@ Then open http://localhost:7860 in your browser.
 ## Deploying on Hugging Face Spaces
 - Set `app_file: app.py` in your Space settings.
 - Make sure all static assets are in the `static/` directory.
+- In the Space settings, set the SDK to `docker` (not Gradio or Streamlit).
