@@ -71,20 +71,24 @@ def format_output(result: Dict[str, Any]) -> str:
     
     return output
 
-@app.route("/")
-def serve_index():
-    return send_from_directory(".", "index.html")
-
-@app.route("/static/<path:filename>")
-def serve_static(filename):
-    return send_from_directory("static", filename)
-
 @app.route("/api/process", methods=["POST"])
 def api_process():
     data = request.get_json()
     input_text = data.get("input_text", "")
     result = process_text(input_text)
     return jsonify(result)
+
+@app.route('/static/<path:filename>')
+def serve_static(filename):
+    return send_from_directory('static', filename)
+
+# Serve index.html for all non-API, non-static routes
+@app.route('/', defaults={'path': ''})
+@app.route('/<path:path>')
+def catch_all(path):
+    if path.startswith('api/') or path.startswith('static/'):
+        return '', 404
+    return send_from_directory('.', 'index.html')
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=7860) 
