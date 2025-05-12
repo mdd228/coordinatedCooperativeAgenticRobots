@@ -1,20 +1,16 @@
-import gradio as gr
-from flask import Flask, request, jsonify
+from flask import Flask, send_from_directory, request, jsonify
 from core.router import Router, MessageType, Message
 from core.state import WorkflowContext
 from agents.input.text_processor import TextProcessor, SpecialCharHandler
 from agents.palindrome.detector import PalindromeDetector
 from agents.output.formatter import OutputFormatter
-import threading
-from typing import List, Dict, Any
 import os
 
-# Initialize Flask app
-app = Flask(__name__)
+app = Flask(__name__, static_folder='static')
 router = Router()
 
 # Store processing logs
-processing_logs: List[str] = []
+processing_logs = []
 
 def log_message(message: str) -> None:
     """Add a message to the processing logs"""
@@ -75,47 +71,20 @@ def format_output(result: Dict[str, Any]) -> str:
     
     return output
 
-# Create Gradio interface
-def create_interface():
-    with gr.Blocks(title="Multi-Agent Palindrome Detector") as interface:
-        gr.Markdown("""
-        # Multi-Agent Palindrome Detector
-        Watch our intelligent agents work together to find palindromes in your text
-        """)
-        
-        with gr.Row():
-            with gr.Column():
-                input_text = gr.Textbox(
-                    label="Enter text to check for palindromes",
-                    placeholder="Type your text here...",
-                    lines=5
-                )
-                process_btn = gr.Button("Process Text")
-            
-            with gr.Column():
-                output = gr.Textbox(
-                    label="Results",
-                    lines=10,
-                    interactive=False
-                )
-        
-        process_btn.click(
-            fn=process_text,
-            inputs=input_text,
-            outputs=output,
-            postprocess=format_output
-        )
-        
-        gr.Markdown("""
-        ## Our Agent Team:
-        - **TextProcessor:** Prepares and cleans the input text
-        - **SpecialCharHandler:** Manages special characters and punctuation
-        - **PalindromeDetector:** Identifies palindrome words
-        - **OutputFormatter:** Formats the results for display
-        """)
-    
-    return interface
+@app.route("/")
+def serve_index():
+    return send_from_directory(".", "index.html")
 
-# Create and launch the interface
-interface = create_interface()
-interface.launch(server_name="0.0.0.0", server_port=7860) 
+@app.route("/static/<path:filename>")
+def serve_static(filename):
+    return send_from_directory("static", filename)
+
+@app.route("/api/process", methods=["POST"])
+def api_process():
+    data = request.get_json()
+    input_text = data.get("input_text", "")
+    result = process_text(input_text)
+    return jsonify(result)
+
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=7860) 
